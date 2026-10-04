@@ -88,13 +88,32 @@ def check(day_time_pairs: list[tuple[str, str]], today: date, use_fixtures: bool
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check Europahalle/La Ville tennis availability.")
     parser.add_argument("--fixtures", action="store_true", help="Use saved sample pages instead of live requests.")
+    parser.add_argument(
+        "--when",
+        action="append",
+        metavar="\"DAY TIMEOFDAY\"",
+        help=(
+            "A day + time-of-day window to check, e.g. --when \"tomorrow afternoon\". "
+            "Repeat --when for multiple windows. If omitted, uses a built-in example."
+        ),
+    )
     args = parser.parse_args()
 
-    # Using the real example from spec.md, with "today" fixed to match the
-    # fixtures we captured (2026-10-04) so results actually line up.
-    today = date(2026, 10, 4)
+    if args.fixtures:
+        # Fixed date so results line up with the real captured sample pages
+        # (which cover 2026-10-04 / 2026-10-05).
+        today = date(2026, 10, 4)
+    else:
+        # Live mode: use the real current date.
+        today = date.today()
+
+    if args.when:
+        day_time_pairs = [tuple(w.rsplit(" ", 1)) for w in args.when]
+    else:
+        day_time_pairs = [("tomorrow", "afternoon"), ("wednesday", "evening")]
+
     result = check(
-        day_time_pairs=[("tomorrow", "afternoon"), ("wednesday", "evening")],
+        day_time_pairs=day_time_pairs,
         today=today,
         use_fixtures=args.fixtures,
     )
