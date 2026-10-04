@@ -78,9 +78,9 @@ Each listed slot should show enough to actually act on it: club, start time, and
 
 ---
 
-## 5. Status: v1 built and verified
+## 5. Status: v1 built, deployed and fully verified
 
-Everything below is written, tested against real captured pages from both clubs, and working correctly:
+Everything below is written, tested, and working correctly — including a real live run against the actual club websites, not just saved sample pages:
 
 - [x] Visit each club's real website and confirm booking system type (see Section 1).
 - [x] Inspected the actual eTennis.at page structure — the availability data is embedded directly in the page's HTML (not a separate API call), as `<div class="slot">` elements per court with `av`/`res` (available/reserved) classes, a start timestamp, and a price tier. See `src/etennis_parser.py`.
@@ -89,8 +89,10 @@ Everything below is written, tested against real captured pages from both clubs,
 - [x] Day/time-of-day phrase resolution ("tomorrow afternoon", "wednesday evening") implemented and tested — see `src/time_windows.py`. Currently handles "today"/"tomorrow"/weekday names directly; looser phrasing would need passing the raw text to Claude for extraction instead (not yet built).
 - [x] Surface handling: Europahalle is hardcoded "carpet" (not in the page data); La Ville is read live from each court's own label text (e.g. "Platz 5 Rebound Ace"), confirmed correct against your stated facts.
 - [x] Full pipeline (`src/check_courts.py`) ties it together and produces output in the Section 4 format, verified end-to-end against real data.
+- [x] Code pushed to GitHub (`github.com/ChriSey1989/tennis-court-finder`, public repo) and deployed to a rented IONOS cloud server (Ubuntu 24.04).
+- [x] **Live internet request confirmed working** — ran `python3 check_courts.py` directly on the server (real request to the actual eTennis.at pages, not `--fixtures`) on 2026-10-04 and got correct, real results back. This was the one piece that couldn't be tested from the development sandbox (no direct internet access there) and is now fully resolved.
 
-**Known limitation, not yet resolved:** the actual *live* internet request (fetching a fresh page for "today," not a saved sample) hasn't been tested, because this development sandbox can't reach the internet directly (see earlier conversation notes). The live-request code is written (`fetch_club_page` in `check_courts.py`) and should work as-is, but needs a real test once there's genuine internet access — e.g. the rented cloud server from Section 7, or any other machine with normal internet.
+**No open items remain for v1.** To run a check, on the server: `cd tennis-court-finder/src && python3 check_courts.py --when "tomorrow afternoon" --when "wednesday evening"` (repeat `--when` for as many day/time-of-day windows as you like; omit it entirely to run the built-in example).
 
 ---
 
